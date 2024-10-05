@@ -25,6 +25,9 @@ result_prop_test <- function(res) {
       p_value = prop_test$p.value,  # Extract the p-value
       statistic = prop_test$statistic # Extract the chi-squared statistic
     ) |> 
-    dplyr::ungroup()
+    dplyr::mutate(lift = round((proportion_test - proportion_control)*100), 
+                  sig_level = dplyr::case_when(p_value <= .05 ~ .95,
+                                 p_value <= .1 & p_value >.05 ~ .90,
+                                 p_value < .2 & p_value > .1 ~ .80)) 
 }
 
