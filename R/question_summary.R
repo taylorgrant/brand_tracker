@@ -35,6 +35,16 @@ question_summary <- function(data, groups = NULL, qq) {
   # renaming for variable as 'svy_q'
   tmp <- data |> dplyr::rename(svy_q = !!rlang::sym(qq))
   
+  # if brand momentum, convert to top 2 / bottom 2 box
+  if (stringr::str_detect(qq, "opn_br")) {
+    tmp <- tmp |> 
+      dplyr::mutate(svy_q = dplyr::case_when(
+        svy_q %in%  c("On its way up, a lot going for it", "On its way up, a little going for it") ~ "On its way up - Top 2 Box",
+        svy_q %in%  c("On its way down, losing a little", "On its way down, nothing going for it") ~ "On its way down - Bottom 2 Box",
+        svy_q == "It's holding its ground" ~ "It's holding its ground"
+      ), 
+      svy_q = factor(svy_q, levels = c("On its way up - Top 2 Box", "It's holding its ground", "On its way down - Bottom 2 Box"))) 
+  }
   # if not unaided awareness, drop NULL (NULL are unaware of BMW; don't want them in our denominator)
   if (qq != "unaided_awareness_coded") {
     tmp <- tmp |>
