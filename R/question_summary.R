@@ -3,7 +3,7 @@
 #' Summarizes a given question; if the data is cut by a group, specify groups 
 #'
 #' @param data Survey dataset, weighted using the `srvyr` package
-#' @param groups Group or vector of groups, names from columns in survey data
+#' @param groups Crosstab group or groups, names from columns in survey data
 #' @param qq Question to summarize
 #'
 #' @return Tidy dataframe with control/exposed, any groups, and questions along with results
@@ -20,6 +20,8 @@
 #' 
 #' question_summary(data = social, qq = brand_vars$var[2]) 
 #' 
+#' question_summary(data = social, groups = "demo_gender", qq = brand_vars$var[2])
+#' 
 #' ## multiple questions 
 #' 
 #' results <- purrr::map(brand_vars$var, ~question_summary(data = social, groups = NULL, qq = .x)) 
@@ -34,6 +36,7 @@ question_summary <- function(data, groups = NULL, qq) {
   
   # renaming for variable as 'svy_q'
   tmp <- data |> dplyr::rename(svy_q = !!rlang::sym(qq))
+  
   
   # if brand momentum, convert to top 2 / bottom 2 box
   if (stringr::str_detect(qq, "opn_br")) {
@@ -52,10 +55,12 @@ question_summary <- function(data, groups = NULL, qq) {
   }
   # set up groupings for the data
   if (!is.null(groups)) {
-    tmp <- tmp |> dplyr::group_by(dplyr::across(dplyr::all_of(match_control)), 
-                                    dplyr::across(dplyr::all_of(groups)), svy_q)
+    tmp <- tmp |> 
+      dplyr::group_by(dplyr::across(dplyr::all_of(match_control)), 
+                      dplyr::across(dplyr::all_of(groups)), svy_q)
   } else {
-    tmp <- tmp |> dplyr::group_by(dplyr::across(dplyr::all_of(match_control)), svy_q)
+    tmp <- tmp |> 
+      dplyr::group_by(dplyr::across(dplyr::all_of(match_control)), svy_q)
   }
   # process for proportion and n count
   tmp <- tmp |> 
