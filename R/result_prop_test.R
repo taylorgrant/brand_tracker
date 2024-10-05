@@ -16,7 +16,7 @@
 result_prop_test <- function(res) {
   res |> 
     tidyr::pivot_wider(
-      names_from = !!rlang::sym(names(df)[1]), 
+      names_from = !!rlang::sym(names(res)[1]), 
       values_from = c(proportion, n, total)
     ) |> 
     dplyr::rowwise() |> 
@@ -27,3 +27,4 @@ result_prop_test <- function(res) {
     ) |> 
     dplyr::ungroup()
 }
+
