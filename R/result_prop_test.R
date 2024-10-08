@@ -14,11 +14,13 @@
 #' result_list <- purrr::map(results, result_prop_test)
 #' }
 result_prop_test <- function(res) {
-  res |> 
+  tmpout <- res |> 
     tidyr::pivot_wider(
       names_from = !!rlang::sym(names(res)[1]), 
       values_from = c(proportion, n, total)
     ) |> 
+    dplyr::filter(!is.na(proportion_control)) |> 
+    dplyr::filter(!is.na(proportion_test)) |> 
     dplyr::rowwise() |> 
     dplyr::mutate(
       prop_test = list(prop.test(c(n_control, n_test), c(total_control, total_test))),
@@ -29,5 +31,21 @@ result_prop_test <- function(res) {
                   sig_level = dplyr::case_when(p_value <= .05 ~ .95,
                                  p_value <= .1 & p_value >.05 ~ .90,
                                  p_value < .2 & p_value > .1 ~ .80)) 
+  
+  # rename any groups 
+  svy_pos <- which(names(tmpout) == "svy_q")
+  if (svy_pos > 1) {
+    colnames(tmpout)[1:(svy_pos - 1)] <- paste0("group_", seq_len(svy_pos - 1))
+  }
+  return(tmpout)
+  
 }
+
+
+
+
+
+
+
+
 
