@@ -15,9 +15,9 @@ brand_choice <- function(brand) {
   if (!stringr::str_detect(tolower(brand), "mercedes|tesla|bmw|audi|lexus|none")) {
     stop("Select a make included in the tracker")
   }
-  if (stringr::str_detect(brand, "merc")) {
+  if (stringr::str_detect(tolower(brand), "merc")) {
     brand <- "Mercedes Benz"
-  } else if (stringr::str_detect(brand, "none")) {
+  } else if (stringr::str_detect(tolower(brand), "none")) {
     brand <- "None of the Above"
   }
   bv_n <- switch(tolower(brand), 
