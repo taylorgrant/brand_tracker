@@ -37,7 +37,6 @@ question_summary <- function(data, groups = NULL, qq) {
   # renaming for variable as 'svy_q'
   tmp <- data |> dplyr::rename(svy_q = !!rlang::sym(qq))
   
-  
   # if brand momentum, convert to top 2 / bottom 2 box
   if (stringr::str_detect(qq, "opn_br")) {
     tmp <- tmp |> 
@@ -48,20 +47,24 @@ question_summary <- function(data, groups = NULL, qq) {
       ), 
       svy_q = factor(svy_q, levels = c("On its way up - Top 2 Box", "It's holding its ground", "On its way down - Bottom 2 Box"))) 
   }
+  
   # if not unaided awareness, drop NULL (NULL are unaware of BMW; don't want them in our denominator)
   if (qq != "unaided_awareness_coded") {
     tmp <- tmp |>
       dplyr::filter(svy_q != "NULL") 
   }
-  # set up groupings for the data
+  # set up groupings for the data (if groups are there)
   if (!is.null(groups)) {
     tmp <- tmp |> 
       dplyr::group_by(dplyr::across(dplyr::all_of(match_control)), 
                       dplyr::across(dplyr::all_of(groups)), svy_q)
+    
   } else {
     tmp <- tmp |> 
       dplyr::group_by(dplyr::across(dplyr::all_of(match_control)), svy_q)
+    
   }
+  
   # process for proportion and n count
   tmp <- tmp |> 
     srvyr::summarise(proportion = srvyr::survey_mean(),
@@ -77,11 +80,13 @@ question_summary <- function(data, groups = NULL, qq) {
       dplyr::filter(svy_q != "NULL") |> #dropping null from unaided awareness
       dplyr::filter(svy_q != 0) |> 
       dplyr::select(-c(proportion_se, n_se))
+    
   } else {
+    
     tmp |> dplyr::group_by(dplyr::across(dplyr::all_of(match_control)), svy_q) |> 
       dplyr::group_by(dplyr::across(dplyr::all_of(match_control))) |> 
       dplyr::mutate(total = sum(n)) |> 
-      dplyr::filter(svy_q != "NULL") |> #dropping null from unaided awareness
+      dplyr::filter(svy_q != "NULL") |> # dropping null from unaided awareness
       dplyr::filter(svy_q != 0) |> 
       dplyr::select(-c(proportion_se, n_se))
   }
