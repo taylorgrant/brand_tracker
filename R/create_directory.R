@@ -1,16 +1,16 @@
 create_directory <- function(brand, filters, main_subfolders = c("tables", "figures"), subfolders = c("Campaign", "Social", "Digital")) {
-  if (is.null(filters)) {
-    # Create the main folder based on brand and date
-    main_path <- here::here(glue::glue("{brand}_{Sys.Date()}"))
+  # if (is.null(filters)) {
+  #   # Create the main folder based on brand and date
+  #   main_path <- here::here(glue::glue("{brand}_{Sys.Date()}"))
+  #   if (!dir.exists(main_path)) {
+  #     dir.create(main_path, recursive = TRUE)
+  #   } 
+  # } else {
+    main_path <- here::here("processed",glue::glue("{brand}-{filters}_{Sys.Date()}"))
     if (!dir.exists(main_path)) {
       dir.create(main_path, recursive = TRUE)
     } 
-  } else {
-    main_path <- here::here(glue::glue("{brand}-{filters}_{Sys.Date()}"))
-    if (!dir.exists(main_path)) {
-      dir.create(main_path, recursive = TRUE)
-    } 
-  }
+  # }
     
   # Create the main subfolders ("tables" and "figures")
   purrr::walk(main_subfolders, function(main_subfolder) {
