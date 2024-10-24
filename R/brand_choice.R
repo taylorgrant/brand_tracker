@@ -21,31 +21,31 @@ brand_choice <- function(brand) {
     brand <- "None of the Above"
   }
   bv_n <- switch(tolower(brand), 
-                 "none of the above" = c("6", "7", "1", "x6"),
-                 "audi" = c("4", "4", "28", "x4"),
-                 "bmw" = c("1", "1", "5", "x1"),
-                 "lexus" = c("7", "31", "31", "x30"),
-                 "mercedes benz" = c("2", "2", "26", "x2"),
-                 "tesla" = c("3", "3", "27", "x3"))
+                 "none of the above" = c("6", "7", "99", "x6"),
+                 "audi" = c("4", "4", "4", "x4"),
+                 "bmw" = c("1", "1", "1", "x1"),
+                 "lexus" = c("7", "31", "5", "x30"),
+                 "mercedes benz" = c("2", "2", "2", "x2"),
+                 "tesla" = c("3", "3", "3", "x3"))
   
   ka_n <- switch(tolower(brand), 
-                 "none of the above" = rep("6", 13),
-                 "audi" = rep("13", 13),
-                 "bmw" = rep("10", 13),
-                 "lexus" = rep("36", 13),
-                 "mercedes benz" = rep("31", 13),
-                 "tesla" = rep("32", 13))
+                 "none of these" = rep("99", 13),
+                 "audi" = rep("4", 13),
+                 "bmw" = rep("1", 13),
+                 "lexus" = rep("5", 13),
+                 "mercedes benz" = rep("2", 13),
+                 "tesla" = rep("3", 13))
   
   ba_n <- switch(tolower(brand), 
-                 "none of the above" = rep("6", 9),
-                 "audi" = rep("13", 9),
-                 "bmw" = rep("10", 9),
-                 "lexus" = rep("36", 9),
-                 "mercedes benz" = rep("31", 9),
-                 "tesla" = rep("32", 9))
+                 "none of the above" = rep("99", 9),
+                 "audi" = rep("4", 9),
+                 "bmw" = rep("1", 9),
+                 "lexus" = rep("5", 9),
+                 "mercedes benz" = rep("2", 9),
+                 "tesla" = rep("3", 9))
   
   bv_vec <- c("awr_a_", "awr_aad_", "con_br_", "opn_br_")
-  ka_vec <- c("att_br_1_", "att_br_18_", "att_br_19_", 
+  ka_vec <- c("att_br_17_", "att_br_18_", "att_br_19_", 
               "att_br_20_", "att_br_21_", "att_br_22_", 
               "att_br_23_", "att_br_24_","att_br_25_",
               "att_br_26_", "att_br_27_", "att_br_28_", 
