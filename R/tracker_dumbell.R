@@ -43,7 +43,8 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                     point_size = 3,
                     text_size = 3,
                     axis_text_size = 10,
-                    lift_size = 4) |> 
+                    lift_size = 4,
+                    fig_height = 4.2) |> 
       dplyr::select(-svy_q) |> 
       dplyr::filter(Category != "Brand Momentum") |> 
       dplyr::mutate(Category = 
@@ -52,29 +53,28 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                                         "Aided Ad\nAwareness", "Purchase\nConsideration", 
                                         "Brand Momentum\nTop 2 Box")),
       Category = forcats::fct_rev(Category)) 
-    sample <- glue::glue("* Statistically significant lift at 90% confidence interval\nSample Overall:", 
-                         "Control = {round(tmp$`total_control`[1])}, Exposed = {round(tmp$`total_test`[1])};",
-                         "\nSample BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
+    sample <- glue::glue("* Statistically significant lift at 90% confidence interval\nSample Overall: ", 
+                         "Control = {round(tmp$`total_control`[1])}, Exposed = {round(tmp$`total_test`[1])}; BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   
     } else if (names(dat)[1] == "Stands for joy") {
-    tmp <- data.table::rbindlist(dat, idcol = "Category") |> 
+    tmp <- data.table::rbindlist(dat, idcol = "Key Attributes") |> 
       dplyr::tibble() |> 
       dplyr::select(-c(prop_test, p_value, statistic)) |> 
-      dplyr::mutate(Category = trimws(gsub("\\(.*", "", Category)),
-                    Category = c("Stands for joy", "Creates joy for\nfuture generations", "Innovative offers\nand products", 
+      dplyr::mutate(`Key Attributes` = trimws(gsub("\\(.*", "", `Key Attributes`)),
+                    `Key Attributes` = c("Stands for joy", "Creates joy for\nfuture generations", "Innovative offers\nand products", 
                                  "Creates positive\nlasting memories", "Committed to\nsustainability", 
                                  "Offers desirable\nproducts and services", "Puts customers first", 
                                  "Makes technology exciting", "Offers engaging and\ninteractive technology", 
                                  "Fits into my lifestyle", "Allows me to focus\non myself", "Stands for luxury", 
                                  "Is a reward for\nmy accomplishments"),
-                    Category = factor(Category, 
+                    `Key Attributes` = factor(`Key Attributes`, 
                                       levels = c("Stands for joy", "Creates joy for\nfuture generations", "Innovative offers\nand products", 
                                                  "Creates positive\nlasting memories", "Committed to\nsustainability", 
                                                  "Offers desirable\nproducts and services", "Puts customers first", 
                                                  "Makes technology exciting", "Offers engaging and\ninteractive technology", 
                                                  "Fits into my lifestyle", "Allows me to focus\non myself", "Stands for luxury", 
                                                  "Is a reward for\nmy accomplishments")),
-                    Category = forcats::fct_rev(Category)) |>
+                    `Key Attributes` = forcats::fct_rev(`Key Attributes`)) |>
       dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .90 ~ 'darkgreen',
                                                 lift < 0 & sig_level >= .90 ~ "red",
                                                 TRUE ~ 'black'),
@@ -95,23 +95,27 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                     point_size = 2,
                     text_size = 2.5,
                     axis_text_size = 8,
-                    lift_size = 3) |> 
+                    lift_size = 3,
+                    fig_height = 4.6) |> 
       dplyr::select(-svy_q)
+    
+    sample <- glue::glue("* Statistically significant lift at 90% confidence interval\nSample ", 
+                         "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   } else {
-    tmp <- data.table::rbindlist(dat, idcol = "Category") |> 
+    tmp <- data.table::rbindlist(dat, idcol = "Brand Attributes") |> 
       dplyr::tibble() |> 
       dplyr::select(-c(prop_test, p_value, statistic)) |> 
-      dplyr::mutate(Category = trimws(gsub("\\(.*", "", Category)),
-                    Category = c("I fully trust", "I can fully\nidentify with", "I really like", 
+      dplyr::mutate(`Brand Attributes` = trimws(gsub("\\(.*", "", `Brand Attributes`)),
+                    `Brand Attributes` = c("I fully trust", "I can fully\nidentify with", "I really like", 
                                  "I would like to own", "I would be willing to\npay more for than for\nother premium brands", 
                                  "Is leading in\nelectric drive", "Is leading in\ndigitalization", 
                                  "Is leading in\nsustainability efforts", "Will still be relevant\nin 50 years"),
-                    Category = factor(Category, 
+                    `Brand Attributes` = factor(`Brand Attributes`, 
                                       levels = c("I fully trust", "I can fully\nidentify with", "I really like", 
                                                  "I would like to own", "I would be willing to\npay more for than for\nother premium brands", 
                                                  "Is leading in\nelectric drive", "Is leading in\ndigitalization", 
                                                  "Is leading in\nsustainability efforts", "Will still be relevant\nin 50 years")),
-                    Category = forcats::fct_rev(Category)) |>
+                    `Brand Attributes` = forcats::fct_rev(`Brand Attributes`)) |>
       dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .90 ~ 'darkgreen',
                                                 lift < 0 & sig_level >= .90 ~ "red",
                                                 TRUE ~ 'black'),
@@ -132,7 +136,11 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                     point_size = 2,
                     text_size = 2.5,
                     axis_text_size = 8,
-                    lift_size = 3)
+                    lift_size = 3,
+                    fig_height = 4.5)
+    
+    sample <- glue::glue("* Statistically significant lift at 90% confidence interval\nSample ", 
+                         "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   }
   
   
@@ -163,7 +171,17 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
   
   # PLOT --------------------------------------------------------------------
   
+  # create directories to save figures
+  path <- create_directory(brand, filters = gsub(" & ", "-", sub3))
+  file_name <- switch(names(tmp)[1], 
+                      "Category" = paste0(tolower(dataset_type),"-brand_vars_plot.png"),
+                      "Key Attributes" = paste0(tolower(dataset_type),"-key_attrs_plot.png"),
+                      "Brand Attributes" = paste0(tolower(dataset_type),"-brand_attrs_plot.png")
+  )
 
+  # rename the first column 
+  tmp <- tmp |> dplyr::rename(Category = 1)
+  
   # run data to get gradient
   segment_data <- tmp |> 
     dplyr::group_by(Category) |> 
@@ -175,9 +193,9 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
   hi <- ceiling(max(tmp$proportion_test)*10)/10
   
   # plotting
-  ggplot2::ggplot() + 
+  plot <- ggplot2::ggplot() + 
     ggplot2::geom_segment(data = segment_data, 
-                          ggplot2::aes(x = x, xend = x, y = y, yend = yend, color = value), size = 1) +
+                          ggplot2::aes(x = x, xend = x, y = y, yend = yend, color = value), linewidth = 1) +
     ggplot2::scale_color_gradient(low = "#6f6f6f", high = "#0166B1", guide = "none") +
     ggplot2::geom_point(data = tmp, 
                         ggplot2::aes(x = Category, y = proportion_control), 
@@ -215,7 +233,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                    plot.title.position = "plot",
                    plot.subtitle = ggtext::element_markdown())
   # sizing for Key Vars
-  ggplot2::ggsave("~/Desktop/tmp_ka1.png", width = 4.45, height = 4.2)
-  ggplot2::ggsave("~/Desktop/tmp_ka2.png", width = 4.45, height = 4.5)
-  ggplot2::ggsave("~/Desktop/tmp_ba3.png", width = 4.45, height = 4.5)
+  ggplot2::ggsave(filename = file.path(path, "figures", dataset_type, file_name), 
+                  plot = plot, 
+                  width = 4.45, height = tmp$fig_height)
 }
