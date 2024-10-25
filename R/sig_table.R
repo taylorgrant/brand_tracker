@@ -1,5 +1,5 @@
 # create tables with percentages and significance 
-sig_table <- function(data) {
+sig_table <- function(data, note) {
   library(gt)
   
   # Programmatically generate the labels for the columns (with <br>)
@@ -28,8 +28,7 @@ sig_table <- function(data) {
         cells_row_groups(groups = TRUE))
     ) |> 
     gt::tab_footnote(
-      # footnote = html(glue("<span>Rows in <b style='color:darkgreen;'>green</b>/<b style='color:red;'>green</b> are significant with confidence level of 90%</span><br>{sample}")),
-      footnote = glue::glue({footnote}),
+      footnote = note,
       locations = gt::cells_title(groups = "title")
     ) |> 
     # aligning the title left
