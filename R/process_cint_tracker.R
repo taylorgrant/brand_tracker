@@ -16,6 +16,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   source(here::here("R", "proptest_dataframe.R"))
   source(here::here("R", "process_list.R"))
   source(here::here("R", "sig_table.R"))
+  source(here::here("R", "process_all_brands.R"))
   
   # 1. READ IN THE SURVEY DATA FROM CINT ------------------------------------
   read_cint(file_location)
@@ -64,54 +65,15 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   purrr::map(social_results, ~tracker_figure(.x, brand, group_filter, "Social"))
   purrr::map(digital_results, ~tracker_figure(.x, brand, group_filter, "Digital"))
   
+  # run full competitive 
+  process_all_brands()
 }
 
-# old <- "~/R/bmw/brand_tracker/cint_data/CX95768 BMW Raw Data File July August 2024.csv"
-file_location <- "~/R/bmw/brand_tracker/cint_data/BMW Deliverable File Sep 2024.csv"
-brand <- "BMW"
-my_groups <- NULL
-my_groups = c("demo_gender")
-
-cint_wrapper(file_location, brand = 'BMW', my_groups = NULL)
-
-res <- cint_wrapper(file_location, brand = 'BMW', my_groups = c("demo_gender"))
- 
-
-# MANUALLY PULLING QUESTIONS ----------------------------------------------
-
-# running through srvyr with weights (campaign, social, digital)
-campaign |> 
-  group_by(matched_control_xmedia, unaided_awareness_coded) |> 
-  srvyr::summarise(proportion = srvyr::survey_mean(),
-                   n = srvyr::survey_total()) 
-
-# or running on the raw data 
-df |> 
-  count(matched_control_xmedia, unaided_awareness_coded) |> 
-  group_by(matched_control_xmedia) |> 
-  mutate(total = sum(n))
- 
-  
-df |> 
-  count(x_media_banner, class_campaign)
 
 
 
-f# mapping and questions ---------------------------------------------------
-
-# i can maybe make this so that it's a function - call the brand and it will populate with 
-# proper variables
-mapping <- read_csv(here("cint_data", "survey_mapping.csv"), n_max = 347) |> 
-  clean_names() |> 
-  mutate(question = make_clean_names(question))
-
-mapping |> 
-  filter(str_detect(question_text, "BMW")) |> 
-  select(question, selection) |> tp()
 
 
-unweighted |> 
-  summarise(total = survey_total())
 
 
 
