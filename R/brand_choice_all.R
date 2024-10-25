@@ -37,5 +37,4 @@ brand_choice_all <- function() {
   )
 }
 
-# Example usage
-result <- brand_choice_all()
+
