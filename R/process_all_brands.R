@@ -136,16 +136,19 @@ process_all_brands <- function(){
   all_results <- split(tmp, tmp$Category)
   
   if (sub3 == "No filters") {
-    footnote <- glue::glue("Sample size: {unique(all_results[[1]]$total)}")
+    footnote <- glue::glue("Total Sample; N: {scales::comma(unique(all_results[[1]]$total))}; (A,B,C,D,E) indicate significant difference at 90% confidence interval")
   } else {
-    footnote <- glue::glue("{sub3} sample size: {unique(all_results[[1]]$total)}")
+    footnote <- glue::glue("{sub3} subsample; N: {scales::comma(unique(all_results[[1]]$total))}; (A,B,C,D,E) indicate significant difference at 90% confidence interval")
   }
   # run everything through prop.test and formatting for gt
   combined_results <- process_list(all_results)
   
+  # to save - need the path 
+  path <- create_directory(brand, filters = gsub(" & ", "-", sub3))
   # build gt table 
-  sig_table(combined_results) |> 
-    gtsave("~/Desktop/size.png", expand = 10)
+  sig_table(combined_results, footnote) |> 
+    gt::gtsave(file.path(path, "competitive", "competitive_table.png"), expand = 10)
+  
   }
   
 
