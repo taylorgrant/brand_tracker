@@ -2,7 +2,7 @@
 
 pacman::p_load(tidyverse, janitor, here, glue, srvyr)
 
-cint_wrapper <- function(file_location, brand, my_groups = NULL, filters = NULL) {
+cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   source(here::here("R", "read_cint.R"))
   source(here::here("R", "brand_choice.R"))
   source(here::here("R", "question_summary.R"))
@@ -10,6 +10,12 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL, filters = NULL)
   source(here::here("R", "table_prep.R"))
   source(here::here("R", "create_directory.R"))
   source(here::here("R", "tracker_table.R"))
+  source(here::here("R", "tracker_dumbell.R"))
+  source(here::here("R", "brand_choice_all.R"))
+  source(here::here("R", "question_summary_all_brands.R"))
+  source(here::here("R", "proptest_dataframe.R"))
+  source(here::here("R", "process_list.R"))
+  source(here::here("R", "sig_table.R"))
   
   # 1. READ IN THE SURVEY DATA FROM CINT ------------------------------------
   read_cint(file_location)
@@ -38,59 +44,60 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL, filters = NULL)
     )
   }
   
-  # set attributes for each dataset before processing (don't work)
-  # attr(campaign, "dataset_type") <- 'Campaign'
-  # attr(social, "dataset_type") <- 'Social'
-  # attr(digital, "dataset_type") <- 'Digital'
-  
   # 3. PROCESS EACH SECTION (CAMPAIGN, SOCIAL, DIGITAL) -----------------------
   campaign_results <- process_tracker(campaign, tracker_qs)
   social_results <- process_tracker(social, tracker_qs)
   digital_results <- process_tracker(digital, tracker_qs)
   
-  # Combine all results into one list
-  all_results <- list(
-    campaign = campaign_results,
-    social = social_results,
-    digital = digital_results
-  )
-  
   # 4. APPLY TABLE PREP TO ALLOW USER TO SELECT FILTERS ---------------------
   group_filter <- table_prep(campaign_results$brand_vars_result[[1]])
   
   # 5. PREPARE THE TABLE USING TRACKER_TABLE FUNCTION ------------------------
-  # Combine results for tracker_table (you may need to unlist some results if required)
-  # You need to pass the relevant result (e.g., brand_vars_result, key_attrs_result, brand_attrs_result)
+  # Combine results for tracker_table 
+  # Need to pass the relevant result (e.g., brand_vars_result, key_attrs_result, brand_attrs_result)
   
-  # Example for campaign results (can be done similarly for social and digital)
-  campaign_tables <- purrr::map(campaign_results, ~tracker_table(.x, brand, group_filter, "Campaign"))
-  social_tables <- purrr::map(social_results, ~tracker_table(.x, brand, group_filter, "Social"))
-  digital_tables <- purrr::map(digital_results, ~tracker_table(.x, brand, group_filter, "Digital"))
+  purrr::map(campaign_results, ~tracker_table(.x, brand, group_filter, "Campaign"))
+  purrr::map(social_results, ~tracker_table(.x, brand, group_filter, "Social"))
+  purrr::map(digital_results, ~tracker_table(.x, brand, group_filter, "Digital"))
+  # 
+  purrr::map(campaign_results, ~tracker_figure(.x, brand, group_filter, "Campaign"))
+  purrr::map(social_results, ~tracker_figure(.x, brand, group_filter, "Social"))
+  purrr::map(digital_results, ~tracker_figure(.x, brand, group_filter, "Digital"))
   
-  # You can return the tables or print them as needed
-  all_tables <- list(
-    campaign = campaign_tables,
-    social = social_tables,
-    digital = digital_tables
-  )
-  return(all_tables)
-  # purrr::iwalk(all_tables, function(tables, section_name) {
-  #   purrr::iwalk(tables, function(table, table_name) {
-  #     file_name <- paste0(section_name, "_", table_name, ".png")
-  #     gtsave(table, file.path(here("output_folder"), file_name), expand = 10)
-  #   })
-  # })
 }
 
-file_location <- "~/R/bmw/brand_tracker/cint_data/CX95768 BMW Raw Data File July August 2024.csv"
+# old <- "~/R/bmw/brand_tracker/cint_data/CX95768 BMW Raw Data File July August 2024.csv"
+file_location <- "~/R/bmw/brand_tracker/cint_data/BMW Deliverable File Sep 2024.csv"
 brand <- "BMW"
 my_groups <- NULL
+my_groups = c("demo_gender")
+
 cint_wrapper(file_location, brand = 'BMW', my_groups = NULL)
 
-cint_wrapper(file_location, brand = 'BMW', my_groups = c("demo_gender"))
+res <- cint_wrapper(file_location, brand = 'BMW', my_groups = c("demo_gender"))
  
 
-# mapping and questions ---------------------------------------------------
+# MANUALLY PULLING QUESTIONS ----------------------------------------------
+
+# running through srvyr with weights (campaign, social, digital)
+campaign |> 
+  group_by(matched_control_xmedia, unaided_awareness_coded) |> 
+  srvyr::summarise(proportion = srvyr::survey_mean(),
+                   n = srvyr::survey_total()) 
+
+# or running on the raw data 
+df |> 
+  count(matched_control_xmedia, unaided_awareness_coded) |> 
+  group_by(matched_control_xmedia) |> 
+  mutate(total = sum(n))
+ 
+  
+df |> 
+  count(x_media_banner, class_campaign)
+
+
+
+f# mapping and questions ---------------------------------------------------
 
 # i can maybe make this so that it's a function - call the brand and it will populate with 
 # proper variables
@@ -103,7 +110,8 @@ mapping |>
   select(question, selection) |> tp()
 
 
-
+unweighted |> 
+  summarise(total = survey_total())
 
 
 
