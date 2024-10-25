@@ -1,7 +1,7 @@
 tracker_table <- function(dat, brand, filters, dataset_type){
   
   library(gt)
-  sub1 <- glue::glue("Make: {brand}")
+  sub1 <- glue::glue("{brand}")
   sub2 <- glue::glue("Channel: {dataset_type}")
   
   # set up the data for the tables 
@@ -78,8 +78,8 @@ tracker_table <- function(dat, brand, filters, dataset_type){
   tmp |> 
     gt::gt() |>
     gt::tab_header(
-      title = glue::glue("Brand Tracker Results"),
-      subtitle = gt::md(glue::glue("{sub1}<br>{sub2}<br>Filter: {sub3}"))
+      title = glue::glue("Brand Tracker Results - {sub1}"),
+      subtitle = gt::md(glue::glue("{sub2}"))
     ) |> 
     gt::tab_footnote(
       footnote = html(glue("<span>Rows in <b style='color:darkgreen;'>green</b>/<b style='color:red;'>green</b> are significant with confidence level of 90%</span><br>{sample}")),
@@ -95,10 +95,10 @@ tracker_table <- function(dat, brand, filters, dataset_type){
       columns = dplyr::contains("Sample"),
       decimals = 0
     ) |> 
-    # setting fonts 
-    gt::opt_table_font(
-      font = list(
-        gt::google_font("Gothic A1")
+    # setting font to BMW which is already loaded
+    opt_table_font(
+      font = c(
+        "BMW"
       )
     ) |> 
     # Remove NAs and replace with empty string
@@ -146,14 +146,6 @@ tracker_table <- function(dat, brand, filters, dataset_type){
       style = gt::cell_text(align = "center"),
       locations = gt::cells_body(columns = -1)
     ) |> 
-    # Conditional formatting for Lift and Sig. Level
-    # gt::tab_style(
-    #   style = gt::cell_text(weight = "bold"),
-    #   locations = gt::cells_body(
-    #     columns = -c(1,2),
-    #     rows = Lift > 0 & `Sig. Level` == 0.8
-    #   )
-    # ) |> 
     gt::tab_style(
       style = gt::cell_text(weight = "bold", color = "darkgreen"),
       locations = gt::cells_body(
@@ -181,12 +173,11 @@ tracker_table <- function(dat, brand, filters, dataset_type){
               ) |> 
     # final options
     gt::tab_options(
-      data_row.padding = gt::px(6),
-      row_group.padding = gt::px(6),
+      data_row.padding = gt::px(4),
+      row_group.padding = gt::px(4),
       source_notes.font.size = gt::px(10),
       footnotes.font.size = gt::px(10),
       footnotes.marks = "", # empty footnote mark
-      table.font.names = "Gothic A1"
     )  |> 
     gt::gtsave(file.path(path, "tables", dataset_type, file_name), expand = 10)
 }
