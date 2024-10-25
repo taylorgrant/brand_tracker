@@ -77,11 +77,10 @@ sig_table <- function(data) {
     ) |> 
     # final options
     gt::tab_options(
-      data_row.padding = gt::px(6),
-      row_group.padding = gt::px(6),
+      data_row.padding = gt::px(4),
+      row_group.padding = gt::px(4),
       source_notes.font.size = gt::px(10),
       footnotes.font.size = gt::px(10),
       footnotes.marks = "" # empty footnote mark
-      # table.font.names = "Open Sans"
     ) 
 }
