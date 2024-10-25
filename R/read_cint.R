@@ -20,14 +20,14 @@ read_cint <- function(file_loc) {
   
   # apply weights (via srvyr package) ---------------------------------------
   # put all into memory
-  digital <<- df |> 
-    srvyr::as_survey_design(ids = 1, weight = weights_digital) # digital
   
-  social <<- df |> 
-    srvyr::as_survey_design(ids = 1, weight = weights_social) # social
+  assign("digital", df |> srvyr::as_survey_design(ids = 1, weight = weights_digital), envir = .GlobalEnv)
   
-  campaign <<- df |> 
-    srvyr::as_survey_design(ids = 1, weight = weights_xmedia) # overall campaign
+  assign("social", df |> srvyr::as_survey_design(ids = 1, weight = weights_social), envir = .GlobalEnv)
+  
+  assign("campaign", df |> srvyr::as_survey_design(ids = 1, weight = weights_xmedia), envir = .GlobalEnv)
+  
+  assign("unweighted", df |> srvyr::as_survey_design(ids = NULL), envir = .GlobalEnv)
   
   assign("df", df, envir = globalenv())
 }
