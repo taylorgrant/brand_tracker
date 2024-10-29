@@ -12,7 +12,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
   }
   
   # sub1 <- glue::glue("Make: {brand}")
-  plot_title <- glue::glue("Channel: {dataset_type}")
+  # plot_title <- glue::glue("Channel: {dataset_type}")
   
   # set up the data for the plots 
   if ((brand == "BMW" & names(dat)[1] == "Unaided Awareness") | (brand != 'BMW' & names(dat)[1] == "Aided Awareness")) {
@@ -40,7 +40,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                                                      lift < 0 & lift >= -2 ~ -.04),
                     lift = ifelse(lift > 0, paste0("+", lift), lift),
                     sig_level = ifelse(is.na(sig_level), 0, sig_level),
-                    lift = ifelse(sig_level >= .9, paste0(lift, "*"), lift),
+                    lift = ifelse(sig_level >= .95, paste0(lift, "*"), lift),
                     nudgex = .25,
                     point_size = 3,
                     text_size = 3,
@@ -77,13 +77,13 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                                                      lift < 0 & lift >= -2 ~ -.04),
                     lift = ifelse(lift > 0, paste0("+", lift), lift),
                     sig_level = ifelse(is.na(sig_level), 0, sig_level),
-                    lift = ifelse(sig_level >= .9, paste0(lift, "*"), lift),
+                    lift = ifelse(sig_level >= .95, paste0(lift, "*"), lift),
                     nudgex = .4,
                     point_size = 2,
                     text_size = 2.5,
                     axis_text_size = 8,
                     lift_size = 3,
-                    fig_height = 4.6) |> 
+                    fig_height = 4.8) |> 
       dplyr::select(-svy_q)
     
     # sample <- glue::glue("* Statistically significant lift at 90% confidence interval\n{sub3} Sample ", 
@@ -107,7 +107,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                                                      lift < 0 & lift >= -2 ~ -.04),
                     lift = ifelse(lift > 0, paste0("+", lift), lift),
                     sig_level = ifelse(is.na(sig_level), 0, sig_level),
-                    lift = ifelse(sig_level >= .9, paste0(lift, "*"), lift),
+                    lift = ifelse(sig_level >= .95, paste0(lift, "*"), lift),
                     nudgex = .4,
                     point_size = 2,
                     text_size = 2.5,
@@ -144,6 +144,8 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
     sub3 <- glue::glue("No filters")
   }
   
+  # captions and titles 
+  plot_title <- glue::glue("Group: {sub3}")
   sample <- glue::glue("* Statistically significant lift at 95% confidence interval\n{sub3} Sample ", 
                        "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   
@@ -239,7 +241,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
          <span style = 'color:#6f6f6f;'>*Control*</span> and 
          <span style = 'color:#0166B1;'>*Exposed*</span>",
          caption = glue::glue(sample)) +
-    ggplot2::theme(axis.text = ggplot2::element_text(size = unique(tmp$axis_text_size), lineheight = .7),
+    ggplot2::theme(axis.text = ggplot2::element_text(size = unique(tmp$axis_text_size), lineheight = .8),
                    plot.caption = ggplot2::element_text(size = 7),
                    plot.title.position = "plot",
                    plot.subtitle = ggtext::element_markdown())
