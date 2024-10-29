@@ -16,6 +16,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   source(here::here("R", "proptest_dataframe.R"))
   source(here::here("R", "process_list.R"))
   source(here::here("R", "sig_table.R"))
+  source(here::here("R", "mental_advantage.R"))
   source(here::here("R", "process_all_brands.R"))
   
   # 1. READ IN THE SURVEY DATA FROM CINT ------------------------------------
@@ -37,7 +38,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
     brand_vars_result <- purrr::map(brand_vars, result_prop_test)
     key_attrs_result <- purrr::map(key_attrs, result_prop_test)
     brand_attrs_result <- purrr::map(brand_attrs, result_prop_test)
-    
+
     list(
       brand_vars_result = brand_vars_result,
       key_attrs_result = key_attrs_result,
@@ -52,6 +53,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   
   # 4. APPLY TABLE PREP TO ALLOW USER TO SELECT FILTERS ---------------------
   group_filter <- table_prep(campaign_results$brand_vars_result[[1]])
+  f <- group_filter
   
   # 5. PREPARE THE TABLE USING TRACKER_TABLE FUNCTION ------------------------
   # Combine results for tracker_table 
@@ -65,8 +67,8 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   purrr::map(social_results, ~tracker_figure(.x, brand, group_filter, "Social"))
   purrr::map(digital_results, ~tracker_figure(.x, brand, group_filter, "Digital"))
   
-  # run full competitive 
-  process_all_brands()
+  # run full competitive to get entire table
+  process_all_brands(f)
 }
 
 
