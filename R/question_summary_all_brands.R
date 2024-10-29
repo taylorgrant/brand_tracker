@@ -1,7 +1,7 @@
 question_summary_all_brands <- function(data, groups = NULL, qq) {
   
   # no control/exposed when looking at all brands 
-  total <- data |> dplyr::summarise(survey_total()) |> dplyr::pull(coef)
+  total <- data |> dplyr::summarise(srvyr::survey_total()) |> dplyr::pull(coef)
   
   # renaming for variable as 'svy_q'
   tmp <- data |> dplyr::rename(svy_q = !!rlang::sym(qq))
