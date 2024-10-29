@@ -25,16 +25,18 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                                                 Category == "Aided Ad Awareness" ~ "Aided Ad\nAwareness",
                                                 Category == "Purchase Consideration" ~ "Purchase\nConsideration",
                                                 TRUE ~ Category)) |> 
-      dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .90 ~ 'darkgreen',
-                                                lift < 0 & sig_level >= .90 ~ "red",
+      dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .95 ~ 'darkgreen',
+                                                lift < 0 & sig_level >= .95 ~ "red",
                                                 TRUE ~ 'black'),
                     control_shift = dplyr::case_when(lift > 2 ~ -.03,
                                                      lift > 0 & lift <= 2 ~ -.04,
                                                      lift < -2 ~ .03,
-                                                     lift < 0 & lift >= -2 ~ .04),
+                                                     lift == 0 ~ -.04,
+                                                     lift <= 0 & lift >= -2 ~ .04),
                     exposed_shift = dplyr::case_when(lift > 2 ~ .03,
                                                      lift > 0 & lift <= 2 ~ .04,
                                                      lift < -2 ~ -.03,
+                                                     lift == 0 ~ .04,
                                                      lift < 0 & lift >= -2 ~ -.04),
                     lift = ifelse(lift > 0, paste0("+", lift), lift),
                     sig_level = ifelse(is.na(sig_level), 0, sig_level),
@@ -43,7 +45,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                     point_size = 3,
                     text_size = 3,
                     axis_text_size = 10,
-                    lift_size = 4,
+                    lift_size = 3,
                     fig_height = 4.2) |> 
       dplyr::select(-svy_q) |> 
       dplyr::filter(Category != "Brand Momentum") |> 
@@ -53,30 +55,15 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                                         "Aided Ad\nAwareness", "Purchase\nConsideration", 
                                         "Brand Momentum\nTop 2 Box")),
       Category = forcats::fct_rev(Category)) 
-    sample <- glue::glue("* Statistically significant lift at 90% confidence interval\nSample Overall: ", 
-                         "Control = {round(tmp$`total_control`[1])}, Exposed = {round(tmp$`total_test`[1])}; BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
+    # sample <- glue::glue("* Statistically significant lift at 90% confidence interval\n{sub3} Sample Overall: ", 
+    #                      "Control = {round(tmp$`total_control`[1])}, Exposed = {round(tmp$`total_test`[1])}; BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   
     } else if (names(dat)[1] == "Stands for joy") {
     tmp <- data.table::rbindlist(dat, idcol = "Key Attributes") |> 
       dplyr::tibble() |> 
       dplyr::select(-c(prop_test, p_value, statistic)) |> 
-      dplyr::mutate(`Key Attributes` = trimws(gsub("\\(.*", "", `Key Attributes`)),
-                    `Key Attributes` = c("Stands for joy", "Creates joy for\nfuture generations", "Innovative offers\nand products", 
-                                 "Creates positive\nlasting memories", "Committed to\nsustainability", 
-                                 "Offers desirable\nproducts and services", "Puts customers first", 
-                                 "Makes technology exciting", "Offers engaging and\ninteractive technology", 
-                                 "Fits into my lifestyle", "Allows me to focus\non myself", "Stands for luxury", 
-                                 "Is a reward for\nmy accomplishments"),
-                    `Key Attributes` = factor(`Key Attributes`, 
-                                      levels = c("Stands for joy", "Creates joy for\nfuture generations", "Innovative offers\nand products", 
-                                                 "Creates positive\nlasting memories", "Committed to\nsustainability", 
-                                                 "Offers desirable\nproducts and services", "Puts customers first", 
-                                                 "Makes technology exciting", "Offers engaging and\ninteractive technology", 
-                                                 "Fits into my lifestyle", "Allows me to focus\non myself", "Stands for luxury", 
-                                                 "Is a reward for\nmy accomplishments")),
-                    `Key Attributes` = forcats::fct_rev(`Key Attributes`)) |>
-      dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .90 ~ 'darkgreen',
-                                                lift < 0 & sig_level >= .90 ~ "red",
+      dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .95 ~ 'darkgreen',
+                                                lift < 0 & sig_level >= .95 ~ "red",
                                                 TRUE ~ 'black'),
                     control_shift = dplyr::case_when(lift > 2 ~ -.03,
                                                      lift > 0 & lift <= 2 ~ -.04,
@@ -99,25 +86,14 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                     fig_height = 4.6) |> 
       dplyr::select(-svy_q)
     
-    sample <- glue::glue("* Statistically significant lift at 90% confidence interval\nSample ", 
-                         "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
+    # sample <- glue::glue("* Statistically significant lift at 90% confidence interval\n{sub3} Sample ", 
+    #                      "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   } else {
     tmp <- data.table::rbindlist(dat, idcol = "Brand Attributes") |> 
       dplyr::tibble() |> 
       dplyr::select(-c(prop_test, p_value, statistic)) |> 
-      dplyr::mutate(`Brand Attributes` = trimws(gsub("\\(.*", "", `Brand Attributes`)),
-                    `Brand Attributes` = c("I fully trust", "I can fully\nidentify with", "I really like", 
-                                 "I would like to own", "I would be willing to\npay more for than for\nother premium brands", 
-                                 "Is leading in\nelectric drive", "Is leading in\ndigitalization", 
-                                 "Is leading in\nsustainability efforts", "Will still be relevant\nin 50 years"),
-                    `Brand Attributes` = factor(`Brand Attributes`, 
-                                      levels = c("I fully trust", "I can fully\nidentify with", "I really like", 
-                                                 "I would like to own", "I would be willing to\npay more for than for\nother premium brands", 
-                                                 "Is leading in\nelectric drive", "Is leading in\ndigitalization", 
-                                                 "Is leading in\nsustainability efforts", "Will still be relevant\nin 50 years")),
-                    `Brand Attributes` = forcats::fct_rev(`Brand Attributes`)) |>
-      dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .90 ~ 'darkgreen',
-                                                lift < 0 & sig_level >= .90 ~ "red",
+      dplyr::mutate(txtcolor = dplyr::case_when(lift > 0 & sig_level >= .95 ~ 'darkgreen',
+                                                lift < 0 & sig_level >= .95 ~ "red",
                                                 TRUE ~ 'black'),
                     control_shift = dplyr::case_when(lift > 2 ~ -.03,
                                                      lift > 0 & lift <= 2 ~ -.04,
@@ -139,10 +115,9 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                     lift_size = 3,
                     fig_height = 4.5)
     
-    sample <- glue::glue("* Statistically significant lift at 90% confidence interval\nSample ", 
-                         "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
+    # sample <- glue::glue("* Statistically significant lift at 90% confidence interval\n{sub3} Sample ", 
+    #                      "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   }
-  
   
   if (length(filters) == 3) {
     sub3 <- glue::glue("{filters[1]} & {filters[2] & filters[3]}")
@@ -167,6 +142,42 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
       dplyr::select(-group_1)
   } else {
     sub3 <- glue::glue("No filters")
+  }
+  
+  sample <- glue::glue("* Statistically significant lift at 95% confidence interval\n{sub3} Sample ", 
+                       "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
+  
+  # convert attributes to factors for consistent plotting 
+  if (names(tmp)[1] == "Key Attributes") {
+    tmp <- tmp |> 
+      dplyr::mutate(`Key Attributes` = trimws(gsub("\\(.*", "", `Key Attributes`)),
+                    `Key Attributes` = c("Stands for joy", "Creates joy for\nfuture generations", "Innovative offers\nand products",
+                                 "Creates positive\nlasting memories", "Committed to\nsustainability",
+                                 "Offers desirable\nproducts and services", "Puts customers first",
+                                 "Makes technology exciting", "Offers engaging and\ninteractive technology",
+                                 "Fits into my lifestyle", "Allows me to focus\non myself", "Stands for luxury",
+                                 "Is a reward for\nmy accomplishments"),
+                    `Key Attributes` = factor(`Key Attributes`,
+                                      levels = c("Stands for joy", "Creates joy for\nfuture generations", "Innovative offers\nand products",
+                                                 "Creates positive\nlasting memories", "Committed to\nsustainability",
+                                                 "Offers desirable\nproducts and services", "Puts customers first",
+                                                 "Makes technology exciting", "Offers engaging and\ninteractive technology",
+                                                 "Fits into my lifestyle", "Allows me to focus\non myself", "Stands for luxury",
+                                                 "Is a reward for\nmy accomplishments")),
+                    `Key Attributes` = forcats::fct_rev(`Key Attributes`))
+  } else if (names(tmp)[1] == "Brand Attributes") {
+    tmp <- tmp |> 
+      dplyr::mutate(`Brand Attributes` = trimws(gsub("\\(.*", "", `Brand Attributes`)),
+                    `Brand Attributes` = c("I fully trust", "I can fully\nidentify with", "I really like",
+                                 "I would like to own", "I would be willing to\npay more for than for\nother premium brands",
+                                 "Is leading in\nelectric drive", "Is leading in\ndigitalization",
+                                 "Is leading in\nsustainability efforts", "Will still be relevant\nin 50 years"),
+                    `Brand Attributes` = factor(`Brand Attributes`,
+                                      levels = c("I fully trust", "I can fully\nidentify with", "I really like",
+                                                 "I would like to own", "I would be willing to\npay more for than for\nother premium brands",
+                                                 "Is leading in\nelectric drive", "Is leading in\ndigitalization",
+                                                 "Is leading in\nsustainability efforts", "Will still be relevant\nin 50 years")),
+                    `Brand Attributes` = forcats::fct_rev(`Brand Attributes`))
   }
   
   # PLOT --------------------------------------------------------------------
