@@ -75,14 +75,18 @@ tracker_table <- function(dat, brand, filters, dataset_type){
                       "Brand Attributes" = paste0(tolower(dataset_type),"-brand_attrs.png")
   )
    
+  footnote_text <- glue::glue(
+    "<span>Rows in <b style='color:darkgreen;'>green</b>/<b style='color:red;'>green</b> are significant with confidence level of 95%</span><br>{sample}"
+  )
+  
   tmp |> 
-    gt::gt() |>
-    gt::tab_header(
+    gt() |>
+    tab_header(
       title = glue::glue("Brand Tracker Results - {sub1}"),
       subtitle = gt::md(glue::glue("{sub2}"))
     ) |> 
-    gt::tab_footnote(
-      footnote = html(glue("<span>Rows in <b style='color:darkgreen;'>green</b>/<b style='color:red;'>green</b> are significant with confidence level of 90%</span><br>{sample}")),
+    tab_footnote(
+      footnote = html(footnote_text),
       locations = gt::cells_title(groups = "title")
     ) |> 
     # formatting percentage
@@ -150,14 +154,14 @@ tracker_table <- function(dat, brand, filters, dataset_type){
       style = gt::cell_text(weight = "bold", color = "darkgreen"),
       locations = gt::cells_body(
         columns = -1,
-        rows = Lift > 0 & `Sig. Level` >= 0.9
+        rows = Lift > 0 & `Sig. Level` >= 0.95
       )
     ) |>
     gt::tab_style(
       style = gt::cell_text(weight = "bold", color = "red"),
       locations = gt::cells_body(
         columns = -c(1:2),
-        rows = Lift < 0 & `Sig. Level` >= 0.9
+        rows = Lift < 0 & `Sig. Level` >= 0.95
       )
     ) |> 
     # Format the Lift column and add "+" for positive values
