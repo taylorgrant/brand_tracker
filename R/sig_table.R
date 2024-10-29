@@ -5,15 +5,21 @@ sig_table <- function(data, note) {
   # Programmatically generate the labels for the columns (with <br>)
   col_labels <- data |> 
     colnames() |> 
-    set_names() |>   # Keeps the original column names as-is
-    map(~ html(glue("{gsub(' ', '<br>', .)}")))  # Programmatically replace space with <br> in labels
+    purrr::set_names() |>   # Keeps the original column names as-is
+    purrr::map(~ html(glue::glue("{gsub(' ', '<br>', .)}")))  # Programmatically replace space with <br> in labels
   
+  # set groups depending on the table to make 
+  if (any(names(data) == "bucket")) {
+    data <- data |> 
+      group_by(bucket)
+  } 
   # Create the gt table with programmatically generated column labels and subscripting
-  data %>%
-    group_by(cat) |> 
+  data |> 
     gt() |> 
+    # hide the cat column from the table
+    cols_hide(columns = "cat") |> 
     tab_header(
-      title = "Competitive summary",
+      title = glue::glue("{unique(data$cat)} - Competitive summary"),
       # subtitle = glue::glue("{sub3}")
       ) |> 
     cols_label(.list = col_labels) |> 
