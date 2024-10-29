@@ -1,6 +1,6 @@
 # have to process all brands at the same time # 
 
-process_all_brands <- function(){
+process_all_brands <- function(group_filter){
   
   # get all of the questions with proper ID variables
   tracker_qs <- brand_choice_all()
@@ -35,10 +35,10 @@ process_all_brands <- function(){
     return(data)  # Return the modified tibble
   }
   
-  renamed_total_results <- map(total_results, ~ map(.x, rename_groups))
+  renamed_total_results <- purrr::map(total_results, ~ purrr::map(.x, rename_groups))
   
   # apply table_prep to allow user to select filters 
-  group_filter <- table_prep(renamed_total_results$brand_vars[[1]])
+  # group_filter <- table_prep(renamed_total_results$brand_vars[[1]])
   
   # get each list and put into tibble for easy filtering if necessary
   brand_vars <- renamed_total_results$brand_vars
@@ -53,16 +53,16 @@ process_all_brands <- function(){
     dplyr::mutate(svy_q = ifelse(svy_q == "On its way up - Top 2 Box", NA, svy_q)) |> 
     tidyr::fill(svy_q, .direction = "down") |> 
     dplyr::filter(Category != "Unaided Awareness") |> 
-    mutate(cat = "Brand Metrics") |> 
-    mutate(Category = factor(Category, levels = c("Aided Awareness", "Aided Ad Awareness",
+    dplyr::mutate(cat = "Brand Metrics") |> 
+    dplyr::mutate(Category = factor(Category, levels = c("Aided Awareness", "Aided Ad Awareness",
                                                   "Purchase Consideration", "Brand Momentum - Top 2 Box"))) |> 
-    mutate(svy_q = factor(svy_q, levels = c("BMW", "Audi", "Lexus", "Mercedes Benz", "Tesla"))) |> 
-    arrange(Category, svy_q)
+    dplyr::mutate(svy_q = factor(svy_q, levels = c("BMW", "Audi", "Lexus", "Mercedes Benz", "Tesla"))) |> 
+    dplyr::arrange(Category, svy_q)
   
   key_attrs_tbl <- data.table::rbindlist(key_attrs, idcol = "Category") |> 
     dplyr::tibble() |> 
-    arrange(Category) |> 
-    mutate(cat = "Key Model Attributes") |> 
+    dplyr::arrange(Category) |> 
+    dplyr::mutate(cat = "Key Model Attributes") |> 
     dplyr::mutate(Category = trimws(gsub("\\(.*", "", Category)),
                   Category = dplyr::case_when(stringr::str_detect(Category, "^Allows") ~ "Allows me to focus on myself",
                                               stringr::str_detect(Category, "^Continuously") ~ "Innovative offers and products",
@@ -90,7 +90,7 @@ process_all_brands <- function(){
   
   brand_attrs_tbl <- data.table::rbindlist(brand_attrs, idcol = "Category") |> 
     dplyr::tibble() |> 
-    mutate(cat = "Brand Attributes") |> 
+    dplyr::mutate(cat = "Brand Attributes") |> 
     dplyr::mutate(Category = trimws(gsub("\\(.*", "", Category))) |> 
     dplyr::mutate(Category = dplyr::case_when(stringr::str_detect(Category, "relevant") ~ "Will still be relevant in 50 years",
                                               stringr::str_detect(Category, "premium") ~ "Pay more than for other premium brands",
@@ -102,7 +102,7 @@ process_all_brands <- function(){
       "Is leading in sustainability efforts", "Will still be relevant in 50 years")),
       svy_q = factor(svy_q, levels = c("BMW", "Audi", "Lexus", "Mercedes Benz", "Tesla"))) |> 
     dplyr::arrange(Category, svy_q)
-
+  
   # put into single tibble
   tmp <- rbind(brand_vars_tbl, key_attrs_tbl, brand_attrs_tbl)
   
@@ -136,18 +136,44 @@ process_all_brands <- function(){
   all_results <- split(tmp, tmp$Category)
   
   if (sub3 == "No filters") {
-    footnote <- glue::glue("Total Sample; N: {scales::comma(unique(all_results[[1]]$total))}; (A,B,C,D,E) indicate significant difference at 90% confidence interval")
+    footnote <- glue::glue("Total Sample; N: {scales::comma(unique(all_results[[1]]$total))}; (A,B,C,D,E) indicate significant difference at 95% confidence interval")
+    footnote2 <- glue::glue("Total Sample; N: {scales::comma(unique(all_results[[1]]$total))}")
   } else {
-    footnote <- glue::glue("{sub3} subsample; N: {scales::comma(unique(all_results[[1]]$total))}; (A,B,C,D,E) indicate significant difference at 90% confidence interval")
+    footnote <- glue::glue("{sub3} subsample; N: {scales::comma(unique(all_results[[1]]$total))}; (A,B,C,D,E) indicate significant difference at 95% confidence interval")
+    footnote2 <- glue::glue("{sub3} subsample; N: {scales::comma(unique(all_results[[1]]$total))}")
   }
   # run everything through prop.test and formatting for gt
   combined_results <- process_list(all_results)
   
+  # split again into lists 
+  results_list <- split(combined_results, combined_results$cat)
+  
+  results_list$`Key Model Attributes` <- results_list$`Key Model Attributes` |> 
+    dplyr::mutate(bucket = c(rep("FREUDE FOREVER", 5), rep("HUMAN CENTRIC", 2),
+                             rep("TECH MAGIC", 2), rep("LIFESTYLE", 2),
+                             rep("LUXURY", 2)))
+    
   # to save - need the path 
   path <- create_directory(brand, filters = gsub(" & ", "-", sub3))
-  # build gt table 
-  sig_table(combined_results, footnote) |> 
-    gt::gtsave(file.path(path, "competitive", "competitive_table.png"), expand = 10)
+  
+  # build gt tables  
+  sig_table(results_list$`Brand Metrics`, footnote) |> 
+    gt::gtsave(file.path(path, "competitive", "competitive_brand_metrics.png"), expand = 10)
+  
+  sig_table(results_list$`Brand Attributes`, footnote) |> 
+    gt::gtsave(file.path(path, "competitive", "competitive_brand_attributes.png"), expand = 10)
+  
+  sig_table(results_list$`Key Model Attributes`, footnote) |> 
+    gt::gtsave(file.path(path, "competitive", "competitive_key model_attributes.png"), expand = 10)
+  
+  # mental advantage for the attributes 
+  if (length(group_filter) < 2) {
+    mental_advantage(key_attrs_tbl, N = nrow(df), filters = group_filter, note = footnote2) |>
+      gt::gtsave(file.path(path, "mental_advantage", "key_attributes.png"), expand = 10)
+
+    mental_advantage(brand_attrs_tbl, N = nrow(df), filters = group_filter, note = footnote2) |>
+      gt::gtsave(file.path(path, "mental_advantage", "brand_attributes.png"), expand = 10)
+  }
   
   }
   
