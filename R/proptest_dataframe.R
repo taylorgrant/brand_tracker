@@ -1,7 +1,7 @@
 # prop.test each tibble within a list 
-proptest_dataframe <- function(df, significance_level = 0.1) {
-  df <- df %>%
-    dplyr::mutate(id = LETTERS[1:n()])  # Assign capital letters as IDs
+proptest_dataframe <- function(df, significance_level = 0.05) {
+  df <- df |> 
+    dplyr::mutate(id = LETTERS[1:dplyr::n()])  # Assign capital letters as IDs
   
   run_prop_test_significant <- function(i, j, df) {
     prop1 <- df$proportion[i]
@@ -34,12 +34,12 @@ proptest_dataframe <- function(df, significance_level = 0.1) {
   }
   
   df <- df |> 
-    mutate(
-      brand_id = glue("{svy_q} {id}"),  
+    dplyr::mutate(
+      brand_id = glue::glue("{svy_q} {id}"),  
       proportion_with_sub = ifelse(
         greater_than != "", 
-        glue("{round(proportion * 100)}% <sub>({greater_than})</sub>"),  
-        glue("{round(proportion * 100)}%")
+        glue::glue("{round(proportion * 100)}% <sub>({greater_than})</sub>"),  
+        glue::glue("{round(proportion * 100)}%")
       )
     )
   
