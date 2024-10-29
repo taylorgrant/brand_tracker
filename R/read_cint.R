@@ -14,9 +14,22 @@
 #' }
 read_cint <- function(file_loc) {
   
+  gen_labels = c("Gen Alpha", "Gen Z", "Millennials", "Gen X",
+                 "Boomers", "Silent", "Greatest")
+  
   df <- readr::read_csv(file_loc) |> 
     janitor::clean_names() |> 
-    dplyr::distinct(response_id, .keep_all = TRUE)
+    dplyr::distinct(response_id, .keep_all = TRUE) |> 
+    dplyr::mutate(yob = lubridate::year(Sys.Date()) - age) |>
+    dplyr::mutate(generations = dplyr::case_when(yob < 2013 & yob > 1996 ~ "Gen Z",
+                                                 yob < 1997 & yob > 1980 ~ "Millennials",
+                                                 yob < 1981 & yob > 1964 ~ "Gen X",
+                                                 yob < 1965 & yob > 1945 ~ "Boomers",
+                                                 yob < 1946 & yob > 1927 ~ "Silent",
+                                                 yob < 1928 ~ "Greatest",
+                                                 yob > 2012 ~ "Gen Alpha"),
+                  genz_millen = ifelse(str_detect(generations, "Z|Mill"), "Gen Z/Millennial", "Gen X/Boomer"),
+                  generations = factor(generations, levels = gen_labels))
   
   # apply weights (via srvyr package) ---------------------------------------
   # put all into memory
