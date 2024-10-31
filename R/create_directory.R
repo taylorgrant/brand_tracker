@@ -1,4 +1,4 @@
-create_directory <- function(brand, filters, main_subfolders = c("tables", "figures", "competitive", "mental_advantage"), subfolders = c("Campaign", "Social", "Digital")) {
+create_directory <- function(brand, filters, main_subfolders = c("tables", "figures", "competitive", "mental_advantage", "raw_data"), subfolders = c("Campaign", "Social", "Digital")) {
 
     main_path <- here::here("processed",glue::glue("{brand}-{stringr::str_replace(filters, '/', '-')}_{Sys.Date()}"))
     if (!dir.exists(main_path)) {
