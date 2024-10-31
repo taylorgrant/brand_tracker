@@ -12,7 +12,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
   }
   
   # sub1 <- glue::glue("Make: {brand}")
-  # plot_title <- glue::glue("Channel: {dataset_type}")
+  channel_text <- glue::glue("Channel: {dataset_type}")
   
   # set up the data for the plots 
   if ((brand == "BMW" & names(dat)[1] == "Unaided Awareness") | (brand != 'BMW' & names(dat)[1] == "Aided Awareness")) {
@@ -113,7 +113,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
                     text_size = 2.5,
                     axis_text_size = 8,
                     lift_size = 3,
-                    fig_height = 4.5)
+                    fig_height = 4.8)
     
     # sample <- glue::glue("* Statistically significant lift at 90% confidence interval\n{sub3} Sample ", 
     #                      "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
@@ -146,7 +146,7 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
   
   # captions and titles 
   plot_title <- glue::glue("Group: {sub3}")
-  sample <- glue::glue("* Statistically significant lift at 95% confidence interval\n{sub3} Sample ", 
+  sample <- glue::glue("* Statistically significant lift at 95% confidence interval\n{channel_text}; {sub3} Sample ", 
                        "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
   
   # convert attributes to factors for consistent plotting 
@@ -244,7 +244,9 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
     ggplot2::theme(axis.text = ggplot2::element_text(size = unique(tmp$axis_text_size), lineheight = .8),
                    plot.caption = ggplot2::element_text(size = 7),
                    plot.title.position = "plot",
-                   plot.subtitle = ggtext::element_markdown())
+                   plot.subtitle = ggtext::element_markdown(),
+                   # plot.background = element_rect(colour = "#0166B1", fill = NA, linewidth = .15)
+                   )
   # sizing for Key Vars
   ggplot2::ggsave(filename = file.path(path, "figures", dataset_type, file_name), 
                   plot = plot, 
