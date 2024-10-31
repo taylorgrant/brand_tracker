@@ -18,6 +18,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   source(here::here("R", "sig_table.R"))
   source(here::here("R", "mental_advantage.R"))
   source(here::here("R", "process_all_brands.R"))
+  source(here::here("R", "raw_tables.R"))
   
   # 1. READ IN THE SURVEY DATA FROM CINT ------------------------------------
   read_cint(file_location)
@@ -69,6 +70,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   
   # run full competitive to get entire table
   process_all_brands(f)
+  raw_tables(campaign_results, filters = f)
 }
 
 
