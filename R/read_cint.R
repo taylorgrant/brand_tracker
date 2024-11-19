@@ -16,6 +16,8 @@ read_cint <- function(file_loc) {
   
   gen_labels = c("Gen Alpha", "Gen Z", "Millennials", "Gen X",
                  "Boomers", "Silent", "Greatest")
+  premium_makes <- c("car_make_29", "car_make_30","car_make_37", "car_make_40", 
+               "car_make_41","car_make_43", "car_make_47", "car_make_48", "car_make_51")
   
   df <- readr::read_csv(file_loc) |> 
     janitor::clean_names() |> 
@@ -29,7 +31,11 @@ read_cint <- function(file_loc) {
                                                  yob < 1928 ~ "Greatest",
                                                  yob > 2012 ~ "Gen Alpha"),
                   genz_millen = ifelse(str_detect(generations, "Z|Mill"), "Gen Z/Millennial", "Gen X/Boomer"),
-                  generations = factor(generations, levels = gen_labels))
+                  generations = factor(generations, levels = gen_labels), 
+    demo_premium = case_when(demo_income != "$100k-149k" & rowSums(across(any_of(premium_makes), ~ . != "0")) > 0 ~ 'Premium',
+                             TRUE ~ "Non-Premium"),
+    date = as.Date(end_date, format = "%m/%d/%Y"),
+    month = month(date, label = TRUE))
   
   # apply weights (via srvyr package) ---------------------------------------
   # put all into memory
