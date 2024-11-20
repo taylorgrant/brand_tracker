@@ -51,6 +51,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   campaign_results <- process_tracker(campaign, tracker_qs)
   social_results <- process_tracker(social, tracker_qs)
   digital_results <- process_tracker(digital, tracker_qs)
+  tv_results <- process_tracker(tv, tracker_qs)
   
   # 4. APPLY TABLE PREP TO ALLOW USER TO SELECT FILTERS ---------------------
   group_filter <- table_prep(campaign_results$brand_vars_result[[1]])
@@ -63,10 +64,12 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   purrr::map(campaign_results, ~tracker_table(.x, brand, group_filter, "Campaign"))
   purrr::map(social_results, ~tracker_table(.x, brand, group_filter, "Social"))
   purrr::map(digital_results, ~tracker_table(.x, brand, group_filter, "Digital"))
+  purrr::map(tv_results, ~tracker_table(.x, brand, group_filter, "TV"))
   # 
   purrr::map(campaign_results, ~tracker_figure(.x, brand, group_filter, "Campaign"))
   purrr::map(social_results, ~tracker_figure(.x, brand, group_filter, "Social"))
   purrr::map(digital_results, ~tracker_figure(.x, brand, group_filter, "Digital"))
+  purrr::map(tv_results, ~tracker_figure(.x, brand, group_filter, "TV"))
   
   # run full competitive to get entire table
   process_all_brands(f)

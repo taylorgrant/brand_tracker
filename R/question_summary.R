@@ -32,7 +32,8 @@ question_summary <- function(data, groups = NULL, qq) {
   # proper control/exposed by ad source
   match_control <- switch(names(data$allprob), "weights_xmedia" = "matched_control_xmedia", 
                           "weights_digital" = "matched_control_digital", 
-                          "weights_social" = 'matched_control_social')
+                          "weights_social" = 'matched_control_social',
+                          "weights_tv" = "matched_control_tv")
   
   # renaming for variable as 'svy_q'
   tmp <- data |> dplyr::rename(svy_q = !!rlang::sym(qq))
@@ -69,7 +70,8 @@ question_summary <- function(data, groups = NULL, qq) {
   tmp <- tmp |> 
     srvyr::summarise(proportion = srvyr::survey_mean(),
                      n = srvyr::survey_total()) |> 
-    dplyr::filter(!!rlang::sym(match_control) != "unclassified")
+    dplyr::filter(!!rlang::sym(match_control) != "unclassified") |> 
+    dplyr::filter(!!rlang::sym(match_control) != "NULL") # TV is `NULL` rather than `unclassified`
   
   # adding totals for easier testing later on
   if (!is.null(groups)) {

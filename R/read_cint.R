@@ -32,10 +32,11 @@ read_cint <- function(file_loc) {
                                                  yob > 2012 ~ "Gen Alpha"),
                   genz_millen = ifelse(str_detect(generations, "Z|Mill"), "Gen Z/Millennial", "Gen X/Boomer"),
                   generations = factor(generations, levels = gen_labels), 
-    demo_premium = case_when(demo_income != "$100k-149k" & rowSums(across(any_of(premium_makes), ~ . != "0")) > 0 ~ 'Premium',
-                             TRUE ~ "Non-Premium"),
-    date = as.Date(end_date, format = "%m/%d/%Y"),
-    month = month(date, label = TRUE))
+                  demo_premium = case_when(demo_income != "$100k-149k" & rowSums(across(any_of(premium_makes), ~ . != "0")) > 0 ~ 'Premium',
+                                           TRUE ~ "Non-Premium"),
+                  date = as.Date(end_date, format = "%m/%d/%Y"),
+                  month = month(date, label = TRUE),
+                  weights_tv = ifelse(is.na(weights_tv), 0, weights_tv)) # NAs to 0 for these weights
   
   # apply weights (via srvyr package) ---------------------------------------
   # put all into memory
@@ -45,6 +46,8 @@ read_cint <- function(file_loc) {
   assign("social", df |> srvyr::as_survey_design(ids = 1, weight = weights_social), envir = .GlobalEnv)
   
   assign("campaign", df |> srvyr::as_survey_design(ids = 1, weight = weights_xmedia), envir = .GlobalEnv)
+  
+  assign("tv", df |> srvyr::as_survey_design(ids = 1, weight = weights_tv), envir = .GlobalEnv)
   
   assign("unweighted", df |> srvyr::as_survey_design(ids = NULL), envir = .GlobalEnv)
   
