@@ -141,10 +141,16 @@ tracker_figure <- function(dat, brand, filters, dataset_type){
       dplyr::filter(group_1 %in% filters[1]) |> 
       dplyr::select(-group_1)
   } else {
-    sub3 <- glue::glue("No filters")
+    sub3 <- glue::glue("Overall")
   }
   
   # captions and titles 
+  if (length(filters) >= 1) {
+    plot_title <- glue::glue("Group: {sub3}")
+  } else {
+    plot_title <- glue::glue("{sub3}")
+  }
+    
   plot_title <- glue::glue("Group: {sub3}")
   sample <- glue::glue("* Statistically significant lift at 95% confidence interval\n{channel_text}; {sub3} Sample ", 
                        "BMW Aware: Control = {round(tmp$`total_control`[3])}, Exposed = {round(tmp$`total_test`[3])}")
