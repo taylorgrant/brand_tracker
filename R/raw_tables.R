@@ -6,7 +6,7 @@ raw_tables <- function(data, filters){
   } else if (length(filters) == 1) {
     sub3 <- glue::glue("{filters[1]}")
   } else {
-    sub3 <- glue::glue("No filters")
+    filters <- glue::glue("Overall")
   }
   brand <- unique(data$brand_vars_result$`Unaided Awareness`$svy_q)
   path <- main_path <- here::here("processed",glue::glue("{brand}-{stringr::str_replace(filters, '/', '-')}_{Sys.Date()}"))

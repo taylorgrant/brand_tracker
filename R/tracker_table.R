@@ -64,7 +64,7 @@ tracker_table <- function(dat, brand, filters, dataset_type){
       dplyr::filter(group_1 %in% filters[1]) |> 
       dplyr::select(-group_1)
   } else {
-    sub3 <- glue::glue("No filters")
+    sub3 <- glue::glue("Overall")
   }
 
   # create directories to save tables 

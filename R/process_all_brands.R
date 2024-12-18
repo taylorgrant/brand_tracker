@@ -129,13 +129,14 @@ process_all_brands <- function(group_filter){
       dplyr::filter(group_1 %in% group_filter[1]) |>  
       dplyr::select(-group_1)
   } else {
-    sub3 <- glue::glue("No filters")
+    # sub3 <- glue::glue("No filters")
+    sub3 <- glue::glue("Overall")
   }
   
   # now split the dataframe into a series of lists by question category 
   all_results <- split(tmp, tmp$Category)
   
-  if (sub3 == "No filters") {
+  if (sub3 == "Overall") {
     footnote <- glue::glue("Total Sample; N: {scales::comma(unique(all_results[[1]]$total))}; (A,B,C,D,E) indicate significant difference at 95% confidence interval")
     footnote2 <- glue::glue("Total Sample; N: {scales::comma(unique(all_results[[1]]$total))}")
   } else {
