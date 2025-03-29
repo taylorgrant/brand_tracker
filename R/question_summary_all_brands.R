@@ -49,8 +49,9 @@ question_summary_all_brands <- function(data, groups = NULL, qq) {
     
   } else {
     
-    tmp |> dplyr::group_by(svy_q) |> 
-      dplyr::mutate(total = total) |> 
+    tmp |> 
+      # dplyr::group_by(svy_q) |> 
+      dplyr::mutate(total = sum(n)) |> 
       dplyr::filter(svy_q != "NULL") |> # dropping null from unaided awareness
       dplyr::filter(svy_q != 0) |> 
       dplyr::select(-c(proportion_se, n_se))
