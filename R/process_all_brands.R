@@ -168,13 +168,13 @@ process_all_brands <- function(group_filter){
     gt::gtsave(file.path(path, "competitive", "competitive_key model_attributes.png"), expand = 10)
   
   # mental advantage for the attributes 
-  if (length(group_filter) < 2) {
-    mental_advantage(key_attrs_tbl, N = nrow(df), filters = group_filter, note = footnote2) |>
-      gt::gtsave(file.path(path, "mental_advantage", "key_attributes.png"), expand = 10)
-
-    mental_advantage(brand_attrs_tbl, N = nrow(df), filters = group_filter, note = footnote2) |>
-      gt::gtsave(file.path(path, "mental_advantage", "brand_attributes.png"), expand = 10)
-  }
+  # if (length(group_filter) < 2) {
+  #   mental_advantage(key_attrs_tbl, N = nrow(df), filters = group_filter, note = footnote2) |>
+  #     gt::gtsave(file.path(path, "mental_advantage", "key_attributes.png"), expand = 10)
+  # 
+  #   mental_advantage(brand_attrs_tbl, N = nrow(df), filters = group_filter, note = footnote2) |>
+  #     gt::gtsave(file.path(path, "mental_advantage", "brand_attributes.png"), expand = 10)
+  # }
   
   }
   
