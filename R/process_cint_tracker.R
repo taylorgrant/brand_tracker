@@ -16,7 +16,7 @@ cint_wrapper <- function(file_location, brand, my_groups = NULL) {
   source(here::here("R", "proptest_dataframe.R"))
   source(here::here("R", "process_list.R"))
   source(here::here("R", "sig_table.R"))
-  source(here::here("R", "mental_advantage.R"))
+  # source(here::here("R", "mental_advantage.R"))
   source(here::here("R", "process_all_brands.R"))
   source(here::here("R", "raw_tables.R"))
   
