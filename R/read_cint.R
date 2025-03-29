@@ -30,6 +30,23 @@ read_cint <- function(file_loc) {
                                                  yob < 1946 & yob > 1927 ~ "Silent",
                                                  yob < 1928 ~ "Greatest",
                                                  yob > 2012 ~ "Gen Alpha"),
+                  demo_region = case_when(demo_state %in% 
+                                            c("ALABAMA", "ARKANSAS", "DISTRICT OF COLUMBIA", 
+                                              "FLORIDA", "GEORGIA", "KENTUCKY", 
+                                              "LOUISIANA", "MISSISSIPPI", "NORTH CAROLINA", "OKLAHOMA", 
+                                              "SOUTH CAROLINA", "TENNESSEE", "TEXAS", "VIRGINIA",
+                                              "WEST VIRGINIA") ~ "South",
+                                          demo_state %in% 
+                                            c("ILLINOIS", "INDIANA", "IOWA", "KANSAS", "MICHIGAN",
+                                              "MINNESOTA", "MISSOURI", "NEBRASKA", 
+                                              "NORTH DAKOTA", "OHIO", "SOUTH DAKOTA",
+                                              "WISCONSIN") ~ "Midwest",
+                                          demo_state %in% 
+                                            c("CONNECTICUT", "MAINE", "MASSACHUSETTS",
+                                              "MARYLAND", "NEW HAMPSHIRE", "NEW JERSEY",
+                                              "NEW YORK", "PENNSYLVANIA", "RHODE ISLAND",
+                                              "VERMONT") ~ "Northeast",
+                                          TRUE ~ "West"),
                   genz_millen = ifelse(str_detect(generations, "Z|Mill"), "Gen Z/Millennial", "Gen X/Boomer"),
                   generations = factor(generations, levels = gen_labels), 
                   demo_premium = case_when(demo_income != "$100k-149k" & rowSums(across(any_of(premium_makes), ~ . != "0")) > 0 ~ 'Premium',
